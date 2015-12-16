@@ -99,36 +99,78 @@ def filter2():
     print rec_count
     return
 def filter3():
+    goon=False
+    genes_counter=0
+    stranded_counter=0
+    genes_tsl1_counter=0
+    antistranded_counter=0
     unique_onlycount=0;
     rec_count=0;
-    nlist=[]
+    ndict={}
+    ndict_dup={}
     linc_file_name='/home/nikos/biothesis/data/ensemble_linc_genes.csv'
     protein_coding_file_name='/home/nikos/biothesis/data/ensemble_protein_coding_gene.csv'
-    map_genes = defaultdict(Counter)#a dict of counters to count 
-                                                                                         #the repetitions by group
-    f = open(linc_file_name, 'r')
-    for line in f:
-#        print line
-        rec_count+=1;
-        gene_id,trans_id,chrom,gene_start,gent_end,strand,tss,tsl = line.split(",")
-        map_genes[(gene_id)][(trans_id,chrom,gene_start,gent_end,strand,tss,tsl)] +=1
-        
-        nlist.append([(gene_id),(trans_id,chrom,gene_start,gent_end,strand,tss,tsl)])
+    linc_test='/home/nikos/biothesis/data/linc_test.csv'
+    f = open(linc_test, 'r')
+    first_line=f.readline()
     
-    for (gene_id), counter in map_genes.items():
-        if(len(counter)==1):
-            unique_onlycount+=1;
-#            print gene_id
-            trans_id,chrom,gene_start,gent_end,strand,tss,tsl = list(counter.keys())[0]
-        # print all the repetitions
-#            print(gene_id,trans_id,chrom,gene_start,gent_end,strand,tss,tsl)
-    print nlist[2]
-    print unique_onlycount
-    print rec_count
+#    print first_line
+#    return
+    for line in f:
+        goon=True
+        rec_count+=1;
+        col1,col2,col3,col4,col5,col6,col7,col8=line.rstrip().split(",")
+        gene_id=col1 
+        trans_id=col2
+        chrom=col3
+        gene_start=col4
+        gene_end=col5
+        strand=col6
+        tss=col7
+        tsl=col8
+        genes_counter+=1;
+        if tsl=='tsl1' and goon:
+            genes_tsl1_counter+=1;
+            goon=True
+        else:
+            goon=False
+        if strand=='-1' and goon:
+                if tss==gene_end:
+                    stranded_counter+=1
+                    goon=True
+                else:
+                    goon=False
+        if strand=='1' and goon:
+            if tss==gene_start:
+                antistranded_counter+=1
+                goon=True
+            else:
+                goon=False
+                
+        if gene_id in ndict_dup and goon:  #for removing over dublicates TSS
+            ndict_dup[gene_id]+=1
+            goon=False
+        elif gene_id in ndict:
+            print 'found one'
+            ndict_dup[gene_id]=1
+            del ndict[gene_id]
+            goon=False
+        if goon:
+            ndict[gene_id]=[trans_id,chrom,gene_start,gene_end,strand,tss,tsl]
+    
+#    print '------------'
+    print first_line.rstrip()
+    for keys in ndict:
+        print keys+','+ndict[keys][0]+','+ndict[keys][1]+','+ndict[keys][2]+','+ndict[keys][3]+','+ndict[keys][4]+','+ndict[keys][5]+','+ndict[keys][6]
+    statistics=False
+    if statistics:
+        print 'total genes in ensemble export= '+str(genes_counter )        
+        print 'genes after tsl1 filter= '+str(genes_tsl1_counter)
+        print 'stranded with same start= '+str(stranded_counter)
+        print 'antistranded  with same start= '+str(antistranded_counter)
+        print 'total  with same start= '+str(antistranded_counter+stranded_counter)
+        
     return
-#test1()
-#filter1()
-#filter2()
 filter3()
  
         

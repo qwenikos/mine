@@ -32,6 +32,7 @@ for aUrl in urls:
     if goon:
         fileUrl=group("url")
         print fileUrl;
+        
         if 1==2:
             filename=fileUrl.replace("://","_")
             filename=filename.replace("/","-")

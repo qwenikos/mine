@@ -31,8 +31,7 @@ for aUrl in urls:
     if regEx is None:goon=False
     if goon:
         fileUrl=group("url")
-        print fileUrl;
-        
+        print fileUrl
         if 1==2:
             filename=fileUrl.replace("://","_")
             filename=filename.replace("/","-")

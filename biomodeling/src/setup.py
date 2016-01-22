@@ -11,7 +11,7 @@ setup (
        # Fill in these to make your Egg ready for upload to
        # PyPI
        author='nikos',
-       author_email='',
+       author_email='nikosp@di.uoa.gr',
 
        #summary = 'Just another Python package for the cheese shop',
        url='',

@@ -25,32 +25,48 @@ def nisnumeric(s):
 def readSdfFile(filename):
     docDic1={}
     enerDic1={}
+    smilesDic={}
 #    print "Start reading SDF file"+filename;
     for mol in readfile("sdf", filename):
 #        print "-----------------------------------------"
         molData=mol.data
+#        print molData
         if  "code" in molData:
             docDic1[molData['code']]=[molData["r_i_docking_score"]]
             enerDic1[molData['code']]=[molData["r_mmod_Potential_Energy-MMFF94s"]]
+            smilesDic[molData['code']]=[mol.write("smi").split()[0]]
 #            print molData['code']
 #            print molData["r_i_docking_score"]
 #            print molData["r_mmod_Potential_Energy-MMFF94s"]
 #    for k in docDic:
 #        print  docDic[k]
-    return docDic1,enerDic1
+    return docDic1,enerDic1,smilesDic
 #    for k in molData:
 #        print k+"-->"+molData[k]
 
 #print "end_read SDF file"
+#--------------------------------------
 
+def readSdfFileMetadata(filename):
+    docDic1={}
+    enerDic1={}
+#    print "Start reading SDF file"+filename;
+    inputfile = readfile("sdf", filename)
+    mol = inputfile.next()
+    mol = inputfile.next()
+#    print mol.write("smi").split()[0]
+    
+   
 #    --------------------------------------
-def saveToFile(docDic,numOfFiles,outputFileName):
+
+def saveToFile(docDic,smilesDic,numOfFiles,outputFileName):
     text_file = open(outputFileName, "w")
     outLine=""
     outLine+="lines"+"\t"+ str(len(docDic))+"\n"
     outLine+="Files"+"\t"+ str(numOfFiles)+"\n"
     for k in docDic:
         outLine+= str(k)
+        outLine+="\t"+str(smilesDic[k])
         for d in docDic[k]:
             outLine+="\t"+d
         outLine+="\n"
@@ -121,6 +137,49 @@ def readFile(filename):
                 processNum-=1
             else:
                 break
+#-----------------------------------------------------
+def createCompoundList(fileList):
+    firstLoop=True
+    loop=0
+    mergedDocDic={}
+    mergedEnerDic={}
+    for fl in fileList:
+        
+        print "-->"+fl+"<--"
+        loop+=1
+        if firstLoop:
+            firstLoop=False
+            docDic,enerDic,smilesDic=readSdfFile(fl)
+            for k in docDic:
+                mergedDocDic[k]=docDic[k]
+            for k in enerDic:
+                mergedEnerDic[k]=enerDic[k]       
+        else:
+
+            newDocDic,newEnerDic,smilesDic=readSdfFile(fl)
+            mergedDocDic.update(newDocDic)
+            mergedEnerDic.update(newEnerDic)
+            for k in newDocDic:
+                if k in docDic:
+                    docDic[k]+=newDocDic[k]
+                else:
+                    docDic[k]=newDocDic[k]  
+
+            for k in mergedDocDic:
+                if k in docDic:
+                    a=1
+                else:
+                    docDic[k]+=["empty"]
+
+    for k in docDic:
+        docDic[k]=[]
+    return docDic
+#-----------------------------------------------------
+def createTimeStamp
+    ts = time.time()
+    st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d_%H_%M_%S')
+    return st
+#-----------------------------------------------------
 ##main program
 #print "Starting Here"
 kcalThreshold=1
@@ -129,14 +188,12 @@ numOfFiles=0
 st=""
 docDic={}
 enerDic={}
+smilesDic={}
 merged={}
+smilesDic={}
 inputPath="/home/nikos/data/"
 filename1="glide-dock_SP_3_23-11_pv.csv"
 filename2=""
-mergedDocDic={}
-mergedEnerDic={}
-#readFile(inputPath+filename1)
-
 
 sdf_file1=inputPath+"ALL/1PYS-ALK5.sdf"
 sdf_file2=inputPath+"ALL/2WOU-ALK5.sdf"
@@ -145,65 +202,37 @@ sdf_file4=inputPath+"ALL/3MYO-ALK1.sdf"
 sdf_file5=inputPath+"ALL/3Q4U-ALK2.sdf"
 sdf_file6=inputPath+"ALL/4BGG-ALK2.sdf"
 
-
-
 sdf_file_test1=inputPath+"ALL/test1.sdf"
 sdf_file_test2=inputPath+"ALL/test2.sdf"
 sdf_file_test3=inputPath+"ALL/test3.sdf"
 sdf_file_test4=inputPath+"ALL/test1.sdf"
 fileList=[sdf_file1,sdf_file2,sdf_file3,sdf_file4,sdf_file5,sdf_file6]
-#fileList=[sdf_file_test1,sdf_file_test2,sdf_file_test3,sdf_file_test4]
-#-----------timestamp
-ts = time.time()
-st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d_%H_%M_%S')
+
+
 #----------end timestamp
 outputFileName="output_"+st+".dat"
-firstLoop=True
-loop=0
-for fl in fileList:
-    numOfFiles=len(fileList)
-    print "-->"+fl+"<--"
-    loop+=1
-    if firstLoop:
-        firstLoop=False
-        docDic,enerDic=readSdfFile(fl)
-        for k in docDic:
-            mergedDocDic[k]=docDic[k]
-        for k in enerDic:
-            mergedEnerDic[k]=enerDic[k]       
-    else:
+#readSdfFileMetadata(sdf_file1)
+numOfFiles=len(fileList)
 
-        newDocDic,newEnerDic=readSdfFile(fl)
-        mergedDocDic.update(newDocDic)
-        mergedEnerDic.update(newEnerDic)
-        for k in newDocDic:
-            if k in docDic:
-                docDic[k]+=newDocDic[k]
-            else:
-                docDic[k]=newDocDic[k]  
-                
-        for k in mergedDocDic:
-            if k in docDic:
-                a=1
-            else:
-                docDic[k]+=["empty"]
- 
-for k in docDic:
-    docDic[k]=[]
+docDic=createCompoundList(fileList)
 
 for fl in fileList:
-        newDocDic,newEnerDic=readSdfFile(fl)
+        newDocDic,newEnerDic,newSmilesDic=readSdfFile(fl)
         for k in docDic:
             if k in newDocDic:
                 docDic[k]+=newDocDic[k]
+            if k in newSmilesDic:
+                smilesDic[k]=newSmilesDic[k]
+            
             else:
                 docDic[k]+=[""]
-                
+for k in smilesDic:
+    print str(k)+"-->"+str(smilesDic[k])
+
 #
 #for k in docDic:
 #    print str(k)+"->"+str(docDic[k])
-
-outStream=saveToFile(docDic,numOfFiles,outputFileName)
+outStream=saveToFile(docDic,smilesDic,numOfFiles,outputFileName)
 print outStream
 
         

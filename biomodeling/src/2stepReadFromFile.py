@@ -20,9 +20,9 @@ def readDataFromFile(filename):
         print i
         i+=1
         cols=line.rstrip().split("\t")
-        print cols[0]
+        print cols[0],cols[1]
     return
 
 #this is the main program
-filename= "output_2016-01-22_01_15_36.dat"
+filename= "output_2016-01-22_13_16_02.dat"
 readDataFromFile(filename)

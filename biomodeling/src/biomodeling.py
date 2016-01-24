@@ -8,6 +8,7 @@ from pybel  import *
 import datetime
 import time
 import argparse
+import copy
  
 def nisnumeric(s):
     try:
@@ -34,16 +35,18 @@ def readSdfFile(filename):
 #        print molData
         if  "code" in molData:
             docDic1[molData['code']]=[molData["r_i_docking_score"]]
-            enerDic1[molData['code']]=[molData["r_mmod_Potential_Energy-MMFF94s"]]
+#            enerDic1[molData['code']]=[molData["r_mmod_Potential_Energy-MMFF94s"]]
+            enerDic1[molData['code']]=[molData["r_i_glide_energy"]]
             smilesDic[molData['code']]=[mol.write("smi").split()[0]]
 #            print molData['code']
 #            print molData["r_i_docking_score"]
 #            print molData["r_mmod_Potential_Energy-MMFF94s"]
-#    for k in docDic:
-#        print  docDic[k]
-    return docDic1,enerDic1,smilesDic
+#        for k in docDic1:
+#            print  docDic1[k]
 #    for k in molData:
 #        print k+"-->"+molData[k]
+    return docDic1,enerDic1,smilesDic
+   
 
 #print "end_read SDF file"
 #--------------------------------------
@@ -74,7 +77,7 @@ def saveToFile(docDic,smilesDic,numOfFiles,outputFileName):
     text_file.write(outLine)
     text_file.close()
     return outLine
-#    --------------------------------------
+#    -------------------------------newDocDic-------
 def merge(d1, d2):
     merged={}
     ''' Merge two dictionaries. '''
@@ -98,7 +101,7 @@ def merge(d1, d2):
 #    unique_onlycount=0;
 #    ndict={}
 #    filtered_dict={}
-#    ndict_dup={}
+#    ndict_dup={}newDocDic
 #    f = open(filename, 'r')
 #    firstLine=f.readline()
 #    columns=firstLine.rstrip().split(",")
@@ -139,7 +142,7 @@ def merge(d1, d2):
 #                processNum-=1
 #            else:
 #                break
-#-----------------------------------------------------
+#------------------------------------------------------------------------------------------
 def createCompoundList(fileList):
     firstLoop=True
     loop=0
@@ -176,18 +179,19 @@ def createCompoundList(fileList):
     for k in docDic:
         docDic[k]=[]
     return docDic
-#-----------------------------------------------------
+#----------------------------------------------------------------------------------
 def createTimeStamp():
     ts = time.time()
     st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d_%H_%M_%S')
     return st
-#----------------------MAIN-------------------------------------------------------------------------------
-#---------------------VARIABLE---------------------------------------------------------------------------
+##--------------------------------end function definition--------------------------------------------
+#------------------------------------MAIN---------------------------------------------------------------
+#------------------------------------VARIABLE----------------------------------------------------------
 ##main program
 #print "Starting Here"
 numOfFiles=0
 st=""
-docDic={}
+compDic={}
 enerDic={}
 smilesDic={}
 smilesDic={}
@@ -220,26 +224,41 @@ else:
     sdf_file_test4=inputPath+"ALL/test1.sdf"
 
     fileList=[sdf_file1,sdf_file2,sdf_file3,sdf_file4,sdf_file5,sdf_file6]
+#    fileList=[sdf_file_test1,sdf_file_test2,sdf_file_test2]
     ##########################
 
 st=createTimeStamp()
-outputFileName="output_"+st+".dat"
+outputFileNameRank="output_RANK"+st+".dat"
+outputFileNameEnergy="output_ENERGY"+st+".dat"
 #readSdfFileMetadata(sdf_file1)
 numOfFiles=len(fileList)
-docDic=createCompoundList(fileList)
+compDic=createCompoundList(fileList) #find all  different compound exists in files
+energyDic={}
+rankDic={}
+energyDic=copy.deepcopy(compDic)
+rankDic=copy.deepcopy(compDic)
+#createTableFromFeatur(compouldsDictionary,dataDictionary)
 for fl in fileList:
         newDocDic,newEnerDic,newSmilesDic=readSdfFile(fl)
-        for k in docDic:
+
+        
+        for k in compDic:
             if k in newDocDic:
-                docDic[k]+=newDocDic[k]
-            if k in newSmilesDic:
+                rankDic[k]+=newDocDic[k]
+#                print "r->"+str(rankDic[k])
+                energyDic[k]+=newEnerDic[k]
+#                print "e->"+str(energyDic[k])
                 smilesDic[k]=newSmilesDic[k]
             
             else:
-                docDic[k]+=["100"]
-for k in smilesDic:
-    print str(k)+"-->"+str(smilesDic[k])
-outStream=saveToFile(docDic,smilesDic,numOfFiles,outputFileName)
-print outStream
+                rankDic[k]+=["100"]
+                energyDic[k]+=["0"]
+
+
+outRankStream=saveToFile(rankDic,smilesDic,numOfFiles,outputFileNameRank)
+outEnergyStream=saveToFile(energyDic,smilesDic,numOfFiles,outputFileNameEnergy)
+print outRankStream
+print"----------"
+print outEnergyStream
 
         

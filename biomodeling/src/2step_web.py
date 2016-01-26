@@ -63,8 +63,22 @@ def htmlHeader():
     print hstr
 
 def htmlBody():
-    print "<body>"
-    print "nikos"
+    
+    energyThres=0
+    rankThres=0
+
+    goon=True
+    form = cgi.FieldStorage()
+    variable = ""
+    value = ""
+    r = ""
+    for key in form.keys():
+            variable = str(key)
+            value = str(form.getvalue(variable))
+            r += "<p>"+ variable +", "+ value +"</p>\n" 
+    fields = "<p>"+ str(r) +"</p>"
+    print fields
+    
     filename= "output_2016-01-24_00_59_02.dat"
     rankThreshold=2
     energyThreshold=1

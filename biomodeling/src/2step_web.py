@@ -13,6 +13,7 @@ def readDataFromFileToDict(filename,rankThreshold,refereneceColumn):
     print columnsNum
     columnsNum=columnsNum.rstrip().split("\t")[1]
     i=0
+    outStr=""
     for line in f:
 #        print "loop "+str(i)
         i+=1
@@ -39,14 +40,15 @@ def readDataFromFileToDict(filename,rankThreshold,refereneceColumn):
                 count+=1
         
         if (count ==int(columnsNum)-1): #an se ola h diafora einai megalyterh apo to threshold
-            print line
+            outStr=line+"\n"
+            #print line
             
             
         
         
         if i==20000:
             break  
-    return
+    return outStr
 
 
 def htmlHeader():
@@ -58,33 +60,56 @@ def htmlHeader():
     hstr+="<meta name='robots' content='noindex'>"+"\n"
     hstr+="<META NAME='robots' CONTENT='nofollow'>"+"\n"
     hstr+="<title>bio-molecular_modeling</title>"+"\n"
-    hstr+="<link rel='stylesheet' type='text/css' href='distyle.css' />"+"\n"
+    hstr+="<link rel='stylesheet' type='text/css' href='normilize.css' />"+"\n"
+#    hsrt+="<link href='http://fonts.googleapis.com/css?family=Nunito:400,300' rel='stylesheet' type='text/css'>"+"\n"
     hstr+="</head>"+"\n"
     print hstr
 
 def htmlBody():
-    
+    str= "<body>"+"\n"
+    str+= "<header><center>"+"\n"
+    str+= "ReRank VS results"+"\n"
+    str+= "</header></center>"+"\n"
+    str+= "<aside>"+"\n"
+    str+="<tr><td colspan=3 align=center><input type=button onclick='location.href=\"uploadFiles.py\"' name='submit' value='Upload Files' class='menubutton'></td></tr><br>"+"\n"
+    str+="<tr><td colspan=3 align=center><input type=button onclick='location.href=\"createTableFiles.py\"' name='submit' value='Create-Table- File Files' class='menubutton'></td></tr><br>"+"\n"
+    str+="<tr><td colspan=3 align=center><input type=button onclick='location.href=\"thresholding.py\"' name='submit' value='Thresholding ' class='menubutton'></td></tr><br>"+"\n"
+    str+="<tr><td colspan=3 align=center><input type=button onclick='location.href=\"help.py\"' name='submit' value= 'Help' class='menubutton'></td></tr><br>"+"\n"
+    str+= "</aside>"+"\n"
+    str+= "<article>"+"\n"
+    str+= "<section>"+"\n"
     energyThres=0
     rankThres=0
-
     goon=True
     form = cgi.FieldStorage()
     variable = ""
     value = ""
     r = ""
-    for key in form.keys():
-            variable = str(key)
-            value = str(form.getvalue(variable))
-            r += "<p>"+ variable +", "+ value +"</p>\n" 
-    fields = "<p>"+ str(r) +"</p>"
-    print fields
+#    for key in form.keys():
+#            variable = str(key)
+#            value = str(form.getvalue(variable))
+#            r += "<p>"+ variable +", "+ value +"</p>\n" 
+#    fields = "<p>"+ str(r) +"</p>"
+#    print fields
     
     filename= "output_2016-01-24_00_59_02.dat"
     rankThreshold=2
     energyThreshold=1
     refereneceColumn=2#the numbering start at 3
-    readDataFromFileToDict(filename,rankThreshold,refereneceColumn)
-    print "</body>"
+    #str+=readDataFromFileToDict(filename,rankThreshold,refereneceColumn)
+    str+= "</section>"+"\n"
+    str+="</article>"+"\n"
+    str+="<article>"+"\n"
+    str+="insert Threshold Values <br>"+"\n"
+    str+="</article>"+"\n"
+    str+="<footer>"+"\n"
+    str+="Nikos Perdikopanis-Biomolecules Modeling-Final Project 2016"+"\n"
+    str+="</footer>"+"\n"
+    
+    str+="</body>"
+   
+    print str
+
 def htmlFooter():
     print "</html>"
 

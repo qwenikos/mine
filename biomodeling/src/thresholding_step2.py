@@ -49,7 +49,7 @@ def readDataFromFileToDict(filename,rankThreshold,refereneceColumn):
             
         
         
-        if i==20000:
+        if i==200000:
             break  
     outStr="<table border=1>"+outStr+"</table>"
     return outStr
@@ -108,7 +108,7 @@ def htmlBody():
     str+= "</section>"+"\n"
     str+="</article>"+"\n"
     str+="<article>"+"\n"
-    str+="insert Threshold Values <br>"+"\n"
+#    str+="insert Threshold Values <br>"+"\n"
     str+="</article>"+"\n"
     str+="<footer>"+"\n"
     str+="Nikos Perdikopanis-Biomolecules Modeling-Final Project 2016"+"\n"

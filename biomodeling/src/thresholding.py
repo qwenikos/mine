@@ -36,7 +36,7 @@ def htmlBody():
     sdf_file4=inputPath+"ALL/3MYO-ALK1.sdf"
     sdf_file5=inputPath+"ALL/3Q4U-ALK2.sdf"
     sdf_file6=inputPath+"ALL/4BGG-ALK2.sdf"
-    str+="<form action='2step_web.py' method='get' >"+"\n"
+    str+="<form action='thresholding_step2.py' method='get' >"+"\n"
     str+="<table border=0>"+"\n"
     str+="<tr><td colspan=2 align=right>Rank Threshold     </td><td><input type='text' name='rankThreshold'>"+"</td></tr>"+"\n"
     str+="<tr><td colspan=2 align=right>Energy Threshold</td><td><input type='text' name='energyThreshold'>"+"</td></tr>"+"\n"
@@ -56,7 +56,7 @@ def htmlBody():
     str+= "</section>"+"\n"
     str+="</article>"+"\n"
     str+="<article>"+"\n"
-    str+="insert Threshold Values <br>"+"\n"
+#    str+="insert Threshold Values <br>"+"\n"
     str+="</article>"+"\n"
     str+="<footer>"+"\n"
     str+="Nikos Perdikopanis-Biomolecules Modeling-Final Project 2016"+"\n"
@@ -70,8 +70,8 @@ def htmlBody():
     
 def htmlFooter():
     print "</html>"
-
 #main program
 htmlHeader()
+
 htmlBody()
 htmlFooter()

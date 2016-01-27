@@ -40,7 +40,10 @@ def readDataFromFileToDict(filename,rankThreshold,refereneceColumn):
                 count+=1
         
         if (count ==int(columnsNum)-1): #an se ola h diafora einai megalyterh apo to threshold
-            outStr=line+"\n"
+            htmlLine=line.replace("\t","</font></td><td><font Face='Arial' size=1>")
+            htmlLine="<tr><td><font Face='Arial' size=1>"+htmlLine+"</font></td></tr>\n"
+            outStr+=htmlLine+"\n"
+            
             #print line
             
             
@@ -48,6 +51,7 @@ def readDataFromFileToDict(filename,rankThreshold,refereneceColumn):
         
         if i==20000:
             break  
+    outStr="<table border=1>"+outStr+"</table>"
     return outStr
 
 
@@ -81,23 +85,26 @@ def htmlBody():
     energyThres=0
     rankThres=0
     goon=True
-    form = cgi.FieldStorage()
-    variable = ""
-    value = ""
-    r = ""
-    for key in form.keys():
-            print "n"
-            variable = str(key)
-#            value = str(form.getvalue(variable))
-#            r += "<p>"+ variable +", "+ value +"</p>\n" 
-#    fields = "<p>"+ str(r) +"</p>"
-#    print fields
-    
-    filename= "output_2016-01-24_00_59_02.dat"
-    rankThreshold=2
-    energyThreshold=1
-    refereneceColumn=2#the numbering start at 3
-    str+=readDataFromFileToDict(filename,rankThreshold,refereneceColumn)
+    rankThreshold,energyThreshold,refereneceColumn=getFormVar()
+    str+="Filtering for<br> "
+    if rankThreshold==None:
+        str+="Rank Threshold=NONE<br>"
+    else:
+        str+="Rank Threshold="+rankThreshold+"<br>"
+    if energyThreshold==None:
+        str+="Energy Threshold=NONE<br>"
+    else:      
+        str+="Energy Threshold="+energyThreshold+"<br>"
+    if refereneceColumn==None:
+        str+="referenece Column =NONE<br>"
+    else:           
+        str+="Column Data="+refereneceColumn+"<br>"
+        
+    filename= "output_RANK2016-01-27_01_49_34.dat"
+#    rankThreshold=2
+#    energyThreshold=1
+#    refereneceColumn=2#the numbering start at 3
+    str+=readDataFromFileToDict(filename,float(rankThreshold),int(refereneceColumn))
     str+= "</section>"+"\n"
     str+="</article>"+"\n"
     str+="<article>"+"\n"
@@ -113,7 +120,12 @@ def htmlBody():
 
 def htmlFooter():
     print "</html>"
-
+def getFormVar():
+    form = cgi.FieldStorage()
+    rankTh = str(form.getvalue("rankThreshold"))
+    EnergyTh = str(form.getvalue("energyThreshold"))
+    BaseFile = str(form.getvalue("base_file"))
+    return rankTh,EnergyTh,BaseFile
 #main program
 htmlHeader()
 htmlBody()

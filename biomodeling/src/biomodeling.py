@@ -72,7 +72,7 @@ def saveToFile(docDic,smilesDic,numOfFiles,outputFileName):
         outLine+= str(k)
         outLine+="\t"+str(smilesDic[k])
         for d in docDic[k]:
-            outLine+="\t"+d
+            outLine+="\t"+str(round(float(d),3))
         outLine+="\n"
     text_file.write(outLine)
     text_file.close()

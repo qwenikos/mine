@@ -29,14 +29,17 @@ def readSdfFile(filename):
     enerDic1={}
     smilesDic={}
 #    print "Start reading SDF file"+filename;
+    ranking_counter=1
     for mol in readfile("sdf", filename):
 #        print "-----------------------------------------"
         molData=mol.data
 #        print molData
-        if  "code" in molData:
-            docDic1[molData['code']]=[molData["r_i_docking_score"]]
+        if  ("code" in molData):
+            docDic1[molData['code']]= [ranking_counter]
+            ranking_counter+=1
+            print ranking_counter
 #            enerDic1[molData['code']]=[molData["r_mmod_Potential_Energy-MMFF94s"]]
-            enerDic1[molData['code']]=[molData["r_i_glide_energy"]]
+            enerDic1[molData['code']]=[molData["r_i_docking_score"]]
             smilesDic[molData['code']]=[mol.write("smi").split()[0]]
 #            print molData['code']
 #            print molData["r_i_docking_score"]
@@ -251,7 +254,7 @@ for fl in fileList:
                 smilesDic[k]=newSmilesDic[k]
             
             else:
-                rankDic[k]+=["100"]
+                rankDic[k]+=["100000"]
                 energyDic[k]+=["0"]
 
 

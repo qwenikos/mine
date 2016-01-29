@@ -4,55 +4,46 @@ import cgi
 def readDataFromFileToDict(filename,rankThreshold,refereneceColumn):
     f = open(filename, 'r')
     dataDict={}
-    goon=True
+    outDict={}
+    outStr=""
     count=0
     linesNum=f.readline()
-    print linesNum
+    outStr+=str(linesNum)+"<br>\n"
     linesNum=linesNum.rstrip().split("\t")[1]
     columnsNum=f.readline()
-    print columnsNum
+    outStr+=str(columnsNum)+"<br>\n"
     columnsNum=columnsNum.rstrip().split("\t")[1]
     i=0
-    outStr=""
+    
     for line in f:
-#        print "loop "+str(i)
         i+=1
         cols=line.rstrip().split("\t")
         compoundName=cols[0]
         smileStr=cols[1]
-        
         dataDict[cols[0]]=[]
         firsrColumn=2
         lastColumn=int(columnsNum)+1
         refColumn=refereneceColumn+1 #efoson xekinan sto 2 
         count=0
-#        print i
         for j in range(firsrColumn,lastColumn+1): #gia kathe compound ypologise th diafora
-#            print "cols[j]="+str(cols[j])
-#            print "cols[refColumn]= "+str(cols[refColumn])
             if cols[j]=="": #an den yphrxe toy dinw  0 poy einai poly megalo
                 cols[j]=0
             if cols[refColumn]=="": #an den yphrxe toy dinw  0 poy einai poly megalo
                 cols[refColumn]=0
             difftoRef=float(cols[j])-float(cols[refColumn])
-#            print"difftoRef="+str(difftoRef)
             if difftoRef>rankThreshold:
-                count+=1
-        
+                count+=1 
         if (count ==int(columnsNum)-1): #an se ola h diafora einai megalyterh apo to threshold
             htmlLine=line.replace("\t","</font></td><td><font Face='Arial' size=1>")
             htmlLine="<tr><td><font Face='Arial' size=1>"+htmlLine+"</font></td></tr>\n"
-            outStr+=htmlLine+"\n"
-            
-            #print line
-            
-            
-        
-        
+            htmlLine+="\n"
+            outStr+=htmlLine
+            outDict[compoundName]=htmlLine
         if i==200000:
             break  
     outStr="<table border=1>"+outStr+"</table>"
-    return outStr
+    
+    return outStr,outDict
 
 
 def htmlHeader():
@@ -70,53 +61,106 @@ def htmlHeader():
     print hstr
 
 def htmlBody():
-    str= "<body>"+"\n"
-    str+= "<header><center>"+"\n"
-    str+= "ReRank VS results"+"\n"
-    str+= "</header></center>"+"\n"
-    str+= "<aside>"+"\n"
-    str+="<tr><td colspan=3 align=center><input type=button onclick='location.href=\"uploadFiles.py\"' name='submit' value='Upload Files' class='menubutton'></td></tr><br>"+"\n"
-    str+="<tr><td colspan=3 align=center><input type=button onclick='location.href=\"createTableFiles.py\"' name='submit' value='Create-Table- File Files' class='menubutton'></td></tr><br>"+"\n"
-    str+="<tr><td colspan=3 align=center><input type=button onclick='location.href=\"thresholding.py\"' name='submit' value='Thresholding ' class='menubutton'></td></tr><br>"+"\n"
-    str+="<tr><td colspan=3 align=center><input type=button onclick='location.href=\"help.py\"' name='submit' value= 'Help' class='menubutton'></td></tr><br>"+"\n"
-    str+= "</aside>"+"\n"
-    str+= "<article>"+"\n"
-    str+= "<section>"+"\n"
+    bstr= "<body>"+"\n"
+    bstr+= "<header><center>"+"\n"
+    bstr+= "ReRank VS results"+"\n"
+    bstr+= "</header></center>"+"\n"
+    bstr+= "<aside>"+"\n"
+    bstr+="<tr><td colspan=3 align=center><input type=button onclick='location.href=\"uploadFiles.py\"' name='submit' value='Upload Files' class='menubutton'></td></tr><br>"+"\n"
+    bstr+="<tr><td colspan=3 align=center><input type=button onclick='location.href=\"createTableFiles.py\"' name='submit' value='Create-Table- File Files' class='menubutton'></td></tr><br>"+"\n"
+    bstr+="<tr><td colspan=3 align=center><input type=button onclick='location.href=\"thresholding.py\"' name='submit' value='Thresholding ' class='menubutton'></td></tr><br>"+"\n"
+    bstr+="<tr><td colspan=3 align=center><input type=button onclick='location.href=\"help.py\"' name='submit' value= 'Help' class='menubutton'></td></tr><br>"+"\n"
+    bstr+= "</aside>"+"\n"
+    bstr+= "<article>"+"\n"
+    bstr+= "<section>"+"\n"
     energyThres=0
     rankThres=0
     goon=True
-    rankThreshold,energyThreshold,refereneceColumn=getFormVar()
-    str+="Filtering for<br> "
-    if rankThreshold==None:
-        str+="Rank Threshold=NONE<br>"
-    else:
-        str+="Rank Threshold="+rankThreshold+"<br>"
-    if energyThreshold==None:
-        str+="Energy Threshold=NONE<br>"
-    else:      
-        str+="Energy Threshold="+energyThreshold+"<br>"
+    rankThreshold,energyThreshold,refereneceColumn,method=getFormVar()
+    energyThreshold==""
     if refereneceColumn==None:
-        str+="referenece Column =NONE<br>"
+        bstr+="referenece Column =NONE<br>"
     else:           
-        str+="Column Data="+refereneceColumn+"<br>"
+        bstr+="Column Data="+refereneceColumn+"<br>"     
+    filenameEnergy= "output_RANK2016-01-24_14_07_09.dat"
+    filenameRank= "output_ENERGY2016-01-24_14_07_09.dat"
+    if method=="rank":
+        bstr+="Filtering with Rank Threshold<br>"
         
-    filename= "output_RANK2016-01-27_13_06_31.dat"
-#    rankThreshold=2
-#    energyThreshold=1
-#    refereneceColumn=2#the numbering start at 3
-    str+=readDataFromFileToDict(filename,float(rankThreshold),int(refereneceColumn))
-    str+= "</section>"+"\n"
-    str+="</article>"+"\n"
-    str+="<article>"+"\n"
-#    str+="insert Threshold Values <br>"+"\n"
-    str+="</article>"+"\n"
-    str+="<footer>"+"\n"
-    str+="Nikos Perdikopanis-Biomolecules Modeling-Final Project 2016"+"\n"
-    str+="</footer>"+"\n"
+        if rankThreshold=="None" or rankThreshold=="" :
+            bstr+="Rank Threshold=NONE<br>"
+        else:
+            
+            bstr+="Rank Threshold="+rankThreshold+"<br>"
+            outS,outD=readDataFromFileToDict(filenameRank,float(rankThreshold),int(refereneceColumn))
+            bstr+=outS
+#            print outD
+        
+    if method=="energy":
+        bstr+="Filtering with energy Threshold<br>"
+        if energyThreshold=="None" or energyThreshold=="":
+            bstr+="Energy Threshold=NONE<br>"
+        else:      
+            bstr+="Rank Threshold="+rankThreshold+"<br>"
+            outS,outD=readDataFromFileToDict(filenameEnergy,float(energyThreshold),int(refereneceColumn))
+            bstr+=outS
+#            print outD
+    if method=="both":
+        outDEnergy={}
+        outDRank={}
+        bstr+="filtering for energy and Ranking thresholds<br>\n"
+        if rankThreshold==None:
+            bstr+="Rank Threshold=NONE<br>"
+        else:
+            bstr+="Rank Threshold="+rankThreshold+"<br>"
+            outS,outDRank=readDataFromFileToDict(filenameRank,float(rankThreshold),int(refereneceColumn))
+        if energyThreshold==None:
+            bstr+="Energy Threshold=NONE<br>"
+        else:      
+            bstr+="Energy Threshold="+energyThreshold+"<br>"
+            outS,outDEnergy=readDataFromFileToDict(filenameEnergy,float(energyThreshold),int(refereneceColumn))
+        allKeys={}
+        for k in outDRank:
+            if k in outDEnergy:
+                allKeys[k]=1
+        for k in outDEnergy:
+            if k in outDRank:
+                allKeys[k]=1
+#        bstr+=str(allKeys)
+        
+        tempStr=""
+        for k in allKeys:
+            tempStr+=outDEnergy[k]+"\n"
+            tempStr+=outDRank[k]+"\n"
+        htmlTable="<table border=1>"+tempStr+"</table>"
+        tempStr=tempStr.replace("</font></td><td><font Face='Arial' size=1>","\t")
+        tempStr=tempStr.replace("<tr>","")
+        tempStr=tempStr.replace("</tr>","")
+        tempStr=tempStr.replace("</td>","")
+        tempStr=tempStr.replace("<td>","")
+        tempStr=tempStr.replace("</font>","")
+        tempStr=tempStr.replace("<font Face='Arial' size=1>","")
+        tempStr=tempStr.replace("\n\n","\n")
+        tempStr=tempStr.replace("\n\n","\n")
+        tempStr=tempStr.replace("\n\t","\n")
+#        print tempStr
+        textFile=open("outputFiltered.txt","w")
+        textFile.write(tempStr)
+        textFile.close()
+        bstr+=htmlTable
+        
+    bstr+= "</section>"+"\n"
+    bstr+="</article>"+"\n"
+    bstr+="<article>"+"\n"
+#    bstr+="insert Threshold Values <br>"+"\n"
+    bstr+="</article>"+"\n"
+    bstr+="<footer>"+"\n"
+    bstr+="Nikos Perdikopanis-Biomolecules Modeling-Final Project 2016"+"\n"
+    bstr+="</footer>"+"\n"
     
-    str+="</body>"
+    bstr+="</body>"
    
-    print str
+    print bstr
 
 def htmlFooter():
     print "</html>"
@@ -125,7 +169,8 @@ def getFormVar():
     rankTh = str(form.getvalue("rankThreshold"))
     EnergyTh = str(form.getvalue("energyThreshold"))
     BaseFile = str(form.getvalue("base_file"))
-    return rankTh,EnergyTh,BaseFile
+    method=str(form.getvalue("method"))
+    return rankTh,EnergyTh,BaseFile,method
 #main program
 htmlHeader()
 htmlBody()

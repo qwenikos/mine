@@ -1,5 +1,7 @@
 #!/usr/bin/python
 import cgi
+from os import listdir
+from os.path import isfile, join
 
 def htmlHeader():
     print "Content-Type: text/html"     # HTML is following
@@ -16,18 +18,18 @@ def htmlHeader():
     print hstr
 
 def htmlBody():
-    str= "<body>"+"\n"
-    str+= "<header><center>"+"\n"
-    str+= "ReRank VS results"+"\n"
-    str+= "</header></center>"+"\n"
-    str+= "<aside>"+"\n"
-    str+="<tr><td colspan=3 align=center><input type=button onclick='location.href=\"uploadFiles.py\"' name='submit' value='Upload Files' class='menubutton'></td></tr><br>"+"\n"
-    str+="<tr><td colspan=3 align=center><input type=button onclick='location.href=\"createTableFiles.py\"' name='submit' value='Create-Table- File Files' class='menubutton'></td></tr><br>"+"\n"
-    str+="<tr><td colspan=3 align=center><input type=button onclick='location.href=\"thresholding.py\"' name='submit' value='Thresholding ' class='menubutton'></td></tr><br>"+"\n"
-    str+="<tr><td colspan=3 align=center><input type=button onclick='location.href=\"help.py\"' name='submit' value= 'Help' class='menubutton'></td></tr><br>"+"\n"
-    str+= "</aside>"+"\n"
-    str+= "<article>"+"\n"
-    str+= "<section>"+"\n"
+    bstr= "<body>"+"\n"
+    bstr+= "<header><center>"+"\n"
+    bstr+= "ReRank VS results"+"\n"
+    bstr+= "</header></center>"+"\n"
+    bstr+= "<aside>"+"\n"
+    bstr+="<tr><td colspan=3 align=center><input type=button onclick='location.href=\"uploadFiles.py\"' name='submit' value='Upload Files' class='menubutton'></td></tr><br>"+"\n"
+    bstr+="<tr><td colspan=3 align=center><input type=button onclick='location.href=\"createTableFiles.py\"' name='submit' value='Create-Table- File Files' class='menubutton'></td></tr><br>"+"\n"
+    bstr+="<tr><td colspan=3 align=center><input type=button onclick='location.href=\"thresholding.py\"' name='submit' value='Thresholding ' class='menubutton'></td></tr><br>"+"\n"
+    bstr+="<tr><td colspan=3 align=center><input type=button onclick='location.href=\"help.py\"' name='submit' value= 'Help' class='menubutton'></td></tr><br>"+"\n"
+    bstr+= "</aside>"+"\n"
+    bstr+= "<article>"+"\n"
+    bstr+= "<section>"+"\n"
     inputPath="/home/nikos/data/"
     sdf_file1=inputPath+"ALL/1PYS-ALK5.sdf"
     sdf_file2=inputPath+"ALL/2WOU-ALK5.sdf"
@@ -35,32 +37,41 @@ def htmlBody():
     sdf_file4=inputPath+"ALL/3MYO-ALK1.sdf"
     sdf_file5=inputPath+"ALL/3Q4U-ALK2.sdf"
     sdf_file6=inputPath+"ALL/4BGG-ALK2.sdf"
-    str+="<form action='createTableFiles_step2.py' method='get' >"+"\n"
-    str+="<table border=0>"+"\n"
-    str+="<tr><th>Analysis</th><th>Filename</th>"
-    str+="<tr><td><input type='checkbox' name='files' value='"+sdf_file1+"'></td><td>"+sdf_file1+"\n"
-    str+="<tr><td><input type='checkbox' name='files' value='"+sdf_file2+"'></td><td>"+sdf_file2+"\n"
-    str+="<tr><td><input type='checkbox' name='files' value='"+sdf_file3+"'></td><td>"+sdf_file3+"\n"
-    str+= "<tr><td><input type='checkbox' name='files' value='"+sdf_file4+"'></td><td>"+sdf_file4+"\n"
-    str+="<tr><td><input type='checkbox' name='files' value='"+sdf_file5+"'></td><td>"+sdf_file5+"\n"
-    str+="<tr><td><input type='checkbox' name='files' value='"+sdf_file6+"'></td><td>"+sdf_file6+"\n"
-    str+="<tr><td colspan=3 align=center><input type=submit name='submit' value='Create Output FIles'></td></tr>"+"\n"
-    str+="</table>"+"\n"
-    str+="</form>"+"\n"
-    str+= "</section>"+"\n"
-    str+="</article>"+"\n"
-    str+="<article>"+"\n"
-    str+="insert Threshold Values <br>"+"\n"
-    str+="</article>"+"\n"
-    str+="<footer>"+"\n"
-    str+="Nikos Perdikopanis-Biomolecules Modeling-Final Project 2016"+"\n"
-    str+="</footer>"+"\n"
-    
-    str+="</body>"
-   
+    bstr+="<form action='createTableFiles_step2.py' method='get' >"+"\n"
+    bstr+="<table border=0>"+"\n"
+    bstr+="<tr><th>Analysis</th><th>Filename</th>"
+    bstr+="<tr><td><input type='checkbox' name='files' value='"+sdf_file1+"'></td><td>"+sdf_file1+"</td></tr>\n"
+    bstr+="<tr><td><input type='checkbox' name='files' value='"+sdf_file2+"'></td><td>"+sdf_file2+"</td></tr>\n"
+    bstr+="<tr><td><input type='checkbox' name='files' value='"+sdf_file3+"'></td><td>"+sdf_file3+"</td></tr>\n"
+    bstr+= "<tr><td><input type='checkbox' name='files' value='"+sdf_file4+"'></td><td>"+sdf_file4+"</td></tr>\n"
+    bstr+="<tr><td><input type='checkbox' name='files' value='"+sdf_file5+"'></td><td>"+sdf_file5+"</td></tr>\n"
+    bstr+="<tr><td><input type='checkbox' name='files' value='"+sdf_file6+"'></td><td>"+sdf_file6+"</td></tr>\n"
+    bstr+="<tr><td>-----</td><td>----</td></tr>\n"
+    fileListinDirectory=[]
+    fileListinDirectory=createSdfFileList()
+    for k in fileListinDirectory:
+       bstr+="<tr><td><input type='checkbox' name='files' value='"+k+"'></td><td>"+k+"\n"
+       
+    bstr+="<tr><td colspan=3 align=center><input type=submit name='submit' value='Create Output FIles'></td></tr>"+"</td></tr>\n"
+    bstr+="</table>"+"\n"
+    bstr+="</form>"+"\n"
+    bstr+=str(createSdfFileList())
+    bstr+= "</section>"+"\n"
+    bstr+="</article>"+"\n"
+    bstr+="<article>"+"\n"
+    bstr+="insert Threshold Values <br>"+"\n"
+    bstr+="</article>"+"\n"
+    bstr+="<footer>"+"\n"
+    bstr+="Nikos Perdikopanis-Biomolecules Modeling-Final Project 2016"+"\n"
+    bstr+="</footer>"+"\n"  
+    bstr+="</body>"
+    print bstr
 
-
-    print str
+def createSdfFileList():
+    mypath="./"
+    onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+    onlyfiles=[f for f in onlyfiles if f[-3:]=="sdf"]
+    return onlyfiles
     
 def htmlFooter():
     print "</html>"

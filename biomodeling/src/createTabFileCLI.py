@@ -88,64 +88,7 @@ def merge(d1, d2):
     merged.update(d1)
     merged.update(d2)
     return merged
-#    --------------------------------------
-
-#def readFile(filename):
-#    global stat_text
-##    print filename
-#    compoundName=''
-#    columnsDict={}
-#    tuples=[]
-#    goon=False
-#    genes_counter=0
-#    stranded_counter=0
-#    genes_tsl1_counter=0
-#    antistranded_counter=0
-#    unique_onlycount=0;
-#    ndict={}
-#    filtered_dict={}
-#    ndict_dup={}newDocDic
-#    f = open(filename, 'r')
-#    firstLine=f.readline()
-#    columns=firstLine.rstrip().split(",")
-#    i=0;
-#    for k in columns:
-#        k=k.strip( '"' )
-#        columnsDict[k]=i
-##        print str(i)+"-->"+k
-#        i+=1
-#       
-##    print columnsDict["Title"]
-##    print columnsDict["Entry ID"]
-##    print columnsDict["docking score"]
-##    print columnsDict["glide energy"]
-#    titleNo=columnsDict["Title"]
-#    entryIdNo=columnsDict["Entry ID"]
-#    dockingScoreNo=columnsDict["docking score"]
-#    glideEnergyNo=columnsDict["glide energy"]
-#    processNum=5
-#    firstLine=True
-#    for line in f:
-#        if firstLine:
-#             firstLine=False
-#        else:
-#            if processNum>0:
-#                goon=True
-#                part=line.rstrip().split(",")
-#                compoundName=part[titleNo]
-#                compoundRank=part[entryIdNo]
-#                compoundDockingScore=part[dockingScoreNo]
-#                if  nisnumeric(compoundDockingScore)==False:
-#                    goon=False
-#                compoundEnergy=part[glideEnergyNo]
-#                if  nisnumeric(compoundEnergy)==False:
-#                    goon=False
-#                if goon: 
-#                    print compoundName,compoundRank,compoundDockingScore,compoundEnergy
-#                processNum-=1
-#            else:
-#                break
-#------------------------------------------------------------------------------------------
+##-------------------------------------------------------------------
 def createCompoundList(fileList):
     firstLoop=True
     loop=0

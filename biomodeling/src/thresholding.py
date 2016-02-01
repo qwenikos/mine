@@ -40,7 +40,7 @@ def htmlBody():
     fileListinDirectory=createSdfFileList()
     for k in fileListinDirectory:
 #        timeStamp=k.rstrip().split("|")[0]
-        bstr+="<tr><td><input type='checkbox' name='filesVersion' value='"+cgi.escape(k).replace("'","")+"'></td><td colspan=2>"+k+"</td></tr>\n"
+        bstr+="<tr><td><input type='radio' name='filesVersion' value='"+cgi.escape(k).replace("'","")+"'></td><td colspan=2>"+k+"</td></tr>\n"
     bstr+="<tr><td colspan=3 align=center><input type=submit name='submit' value='Go on'></td></tr>"+"\n"
     bstr+="</table>"+"\n"
     bstr+="</form>"+"\n"

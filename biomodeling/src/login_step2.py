@@ -11,7 +11,7 @@ def htmlHeader():
     hstr+="<meta name='robots' content='noindex'>"+"\n"
     hstr+="<META NAME='robots' CONTENT='nofollow'>"+"\n"
     hstr+="<title>bio-molecular_modeling</title>"+"\n"
-    hstr+="<link rel='stylesheet' type='text/css' href='normilize.css' />"+"\n"
+    hstr+="<link rel='stylesheet' type='text/css' href='css/normilize.css' />"+"\n"
 #    hsrt+="<link href='http://fonts.googleapis.com/css?family=Nunito:400,300' rel='stylesheet' type='text/css'>"+"\n"
     hstr+="</head>"+"\n"
     print hstr
@@ -40,7 +40,7 @@ def htmlBody():
         str+="<form action='2step_web.py' method='get' >"+"\n"
         str+="<table border=0>"+"\n"
         str+="<tr><td  align=center>Select from the menu on the left panel"+"</td></tr>"+"\n"
-        str+="<tr><td  align=center><img src='caffeine_molecule_T.png' width=150>"+"</td></tr>"+"\n"
+        str+="<tr><td  align=center><img src='images/caffeine_molecule_T.png' width=150>"+"</td></tr>"+"\n"
     #    str+="<tr><td colspan=2 align=right>Energy Threshold</td><td><input type='text' name='energyThreshold'>"+"</td></tr>"+"\n"
         str+="</table>"+"\n"
 

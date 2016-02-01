@@ -2,6 +2,7 @@
 import cgi
 from os import listdir
 from os.path import isfile, join
+import sys
 
 def htmlHeader():
     print "Content-Type: text/html"     # HTML is following
@@ -12,7 +13,7 @@ def htmlHeader():
     hstr+="<meta name='robots' content='noindex'>"+"\n"
     hstr+="<META NAME='robots' CONTENT='nofollow'>"+"\n"
     hstr+="<title>bio-molecular_modeling</title>"+"\n"
-    hstr+="<link rel='stylesheet' type='text/css' href='normilize.css' />"+"\n"
+    hstr+="<link rel='stylesheet' type='text/css' href='css/normilize.css' />"+"\n"
 #    hsrt+="<link href='http://fonts.googleapis.com/css?family=Nunito:400,300' rel='stylesheet' type='text/css'>"+"\n"
     hstr+="</head>"+"\n"
     print hstr
@@ -40,13 +41,14 @@ def htmlBody():
     bstr+="<form action='createTableFiles_step2.py' method='get' >"+"\n"
     bstr+="<table border=0>"+"\n"
     bstr+="<tr><th>Analysis</th><th>Filename</th>"
-    bstr+="<tr><td><input type='checkbox' name='files' value='"+sdf_file1+"'></td><td>"+sdf_file1+"</td></tr>\n"
-    bstr+="<tr><td><input type='checkbox' name='files' value='"+sdf_file2+"'></td><td>"+sdf_file2+"</td></tr>\n"
-    bstr+="<tr><td><input type='checkbox' name='files' value='"+sdf_file3+"'></td><td>"+sdf_file3+"</td></tr>\n"
-    bstr+= "<tr><td><input type='checkbox' name='files' value='"+sdf_file4+"'></td><td>"+sdf_file4+"</td></tr>\n"
-    bstr+="<tr><td><input type='checkbox' name='files' value='"+sdf_file5+"'></td><td>"+sdf_file5+"</td></tr>\n"
-    bstr+="<tr><td><input type='checkbox' name='files' value='"+sdf_file6+"'></td><td>"+sdf_file6+"</td></tr>\n"
-    bstr+="<tr><td>-----</td><td>----</td></tr>\n"
+    
+#    bstr+="<tr><td><input type='checkbox' name='files' value='"+sdf_file1+"'></td><td>"+sdf_file1+"</td></tr>\n"
+#    bstr+="<tr><td><input type='checkbox' name='files' value='"+sdf_file2+"'></td><td>"+sdf_file2+"</td></tr>\n"
+#    bstr+="<tr><td><input type='checkbox' name='files' value='"+sdf_file3+"'></td><td>"+sdf_file3+"</td></tr>\n"
+#    bstr+= "<tr><td><input type='checkbox' name='files' value='"+sdf_file4+"'></td><td>"+sdf_file4+"</td></tr>\n"
+#    bstr+="<tr><td><input type='checkbox' name='files' value='"+sdf_file5+"'></td><td>"+sdf_file5+"</td></tr>\n"
+#    bstr+="<tr><td><input type='checkbox' name='files' value='"+sdf_file6+"'></td><td>"+sdf_file6+"</td></tr>\n"
+#    bstr+="<tr><td>-----</td><td>----</td></tr>\n"
     fileListinDirectory=[]
     fileListinDirectory=createSdfFileList()
     for k in fileListinDirectory:
@@ -55,11 +57,11 @@ def htmlBody():
     bstr+="<tr><td colspan=3 align=center><input type=submit name='submit' value='Create Output FIles'></td></tr>"+"</td></tr>\n"
     bstr+="</table>"+"\n"
     bstr+="</form>"+"\n"
-    bstr+=str(createSdfFileList())
+#    bstr+=str(createSdfFileList())
     bstr+= "</section>"+"\n"
     bstr+="</article>"+"\n"
     bstr+="<article>"+"\n"
-    bstr+="insert Threshold Values <br>"+"\n"
+#    bstr+="insert Threshold Values <br>"+"\n"
     bstr+="</article>"+"\n"
     bstr+="<footer>"+"\n"
     bstr+="Nikos Perdikopanis-Biomolecules Modeling-Final Project 2016"+"\n"
@@ -68,9 +70,10 @@ def htmlBody():
     print bstr
 
 def createSdfFileList():
-    mypath="./"
+    mypath="./inputSDF/"
     onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
     onlyfiles=[f for f in onlyfiles if f[-3:]=="sdf"]
+#    sys.stderr.write(str(onlyfiles)+".\n")
     return onlyfiles
     
 def htmlFooter():

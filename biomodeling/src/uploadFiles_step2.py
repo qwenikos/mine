@@ -14,7 +14,7 @@ def htmlHeader():
     hstr+="<meta name='robots' content='noindex'>"+"\n"
     hstr+="<META NAME='robots' CONTENT='nofollow'>"+"\n"
     hstr+="<title>bio-molecular_modeling</title>"+"\n"
-    hstr+="<link rel='stylesheet' type='text/css' href='normilize.css' />"+"\n"
+    hstr+="<link rel='stylesheet' type='text/css' href='css/normilize.css' />"+"\n"
 #    hsrt+="<link href='http://fonts.googleapis.com/css?family=Nunito:400,300' rel='stylesheet' type='text/css'>"+"\n"
     hstr+="</head>"+"\n"
     print hstr
@@ -33,7 +33,7 @@ def htmlBody():
     bstr+= "<article>"+"\n"
     bstr+= "<section>"+"\n"
 ##inser data here
-    UPLOAD_DIR="/home/nikos/biothesis/github/mine/biomodeling/src"
+    UPLOAD_DIR="/home/nikos/biothesis/github/mine/biomodeling/src/inputSDF/"
 #    bstr+= printFileData("userfile1")
     formFieldList=["userfile1","userfile2","userfile3","userfile4","userfile5","userfile6"]
     bstr+=save_uploaded_file (formFieldList, UPLOAD_DIR)
@@ -93,20 +93,22 @@ def save_uploaded_file (form_field_list, upload_dir):
             goon=False
         if fileitem.filename=="":
             fileitem.filename
-            output+="blank<br>"
+#            output+="blank<br>"
+            output+=""
             goon=False
     #    fout = file (os.path.join(upload_dir, fileitem.filename), 'wb')
         
         if goon==True:
-            fout=file(fileitem.filename,'wb')
-            output+="loop<br>"
+            fout=file(upload_dir+fileitem.filename,'wb')
+#            output+="loop<br>"
+            output+=""
             while 1:
                 chunk = fileitem.file.read(100000000)
 #                output+=chunk
                 if not chunk: break
                 fout.write (chunk)
             fout.close()
-            output+="finito "+fileitem.filename+"<br>"
+            output+="uploaded:"+fileitem.filename+"<br>"
     return output
 
 #main program

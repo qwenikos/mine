@@ -11,7 +11,7 @@ def htmlHeader():
     hstr+="<meta name='robots' content='noindex'>"+"\n"
     hstr+="<META NAME='robots' CONTENT='nofollow'>"+"\n"
     hstr+="<title>bio-molecular_modeling</title>"+"\n"
-    hstr+="<link rel='stylesheet' type='text/css' href='normilize.css' />"+"\n"
+    hstr+="<link rel='stylesheet' type='text/css' href='css/normilize.css' />"+"\n"
 #    hsrt+="<link href='http://fonts.googleapis.com/css?family=Nunito:400,300' rel='stylesheet' type='text/css'>"+"\n"
     hstr+="</head>"+"\n"
     print hstr
@@ -61,7 +61,7 @@ def htmlBody():
     str+= "</section>"+"\n"
     str+="</article>"+"\n"
     str+="<article>"+"\n"
-    str+="insert Threshold Values <br>"+"\n"
+#    str+="insert Threshold Values <br>"+"\n"
     str+="</article>"+"\n"
     str+="<footer>"+"\n"
     str+="Nikos Perdikopanis-Biomolecules Modeling-Final Project 2016"+"\n"

@@ -20,22 +20,32 @@ def nisnumeric(s):
         pass
     return False   
 #---------------------------------------
-def readSdfFile(filename):
+def readSdfFile(filename,inputPath):
     docDic1={}
     enerDic1={}
     smilesDic={}
+    ranking_counter=1
 #    print "Start reading SDF file"+filename;
+    filename=inputPath+filename
     for mol in readfile("sdf", filename):
 #        print "-----------------------------------------"
         molData=mol.data
 #        print molData
-        if  "code" in molData:
-            docDic1[molData['code']]=[molData["r_i_docking_score"]]
+        if  ("code" in molData):
+            docDic1[molData['code']]= [ranking_counter]
+            ranking_counter+=1
+#            print ranking_counter
 #            enerDic1[molData['code']]=[molData["r_mmod_Potential_Energy-MMFF94s"]]
-            enerDic1[molData['code']]=[molData["r_i_glide_energy"]]
+            enerDic1[molData['code']]=[molData["r_i_docking_score"]]
             smilesDic[molData['code']]=[mol.write("smi").split()[0]]
+#            print molData['code']
+#            print molData["r_i_docking_score"]
+#            print molData["r_mmod_Potential_Energy-MMFF94s"]
+#        for k in docDic1:
+#            print  docDic1[k]
+#    for k in molData:
+#        print k+"-->"+molData[k]
     return docDic1,enerDic1,smilesDic
-   
 
 #print "end_read SDF file"
 #--------------------------------------
@@ -52,11 +62,19 @@ def readSdfFileMetadata(filename):
    
 #    --------------------------------------
 
-def saveToFile(docDic,smilesDic,numOfFiles,outputFileName):
+def saveToFile(fileList,docDic,smilesDic,numOfFiles,outputFileName):
     text_file = open(outputFileName, "w")
     outLine=""
     outLine+="lines"+"\t"+ str(len(docDic))+"\n"
     outLine+="Files"+"\t"+ str(numOfFiles)+"\n"
+    i=0
+    for fl in fileList:
+        if i==0:
+            outLine+=fl
+            i=1
+        else:
+            outLine+="\t"+fl
+    outLine+="\n"
     for k in docDic:
         outLine+= str(k)
         outLine+="\t"+str(smilesDic[k])
@@ -76,41 +94,47 @@ def merge(d1, d2):
     return merged
 #    --------------------------------------
 #------------------------------------------------------------------------------------------
-def createCompoundList(fileList):
+def createCompoundList(fileList,inputPath):
     firstLoop=True
     loop=0
     mergedDocDic={}
     mergedEnerDic={}
     for fl in fileList:
-        
-#        print "-->"+fl+"<--"
+        sys.stderr.write(str(time.time())+" create compound list for "+str(fl)+".\n")
         loop+=1
         if firstLoop:
+            sys.stderr.write("step_1"+".\n")
             firstLoop=False
-            docDic,enerDic,smilesDic=readSdfFile(fl)
+            docDic,enerDic,smilesDic=readSdfFile(fl,inputPath)
+#            sys.stderr.write("step_1_1"+".\n")
             for k in docDic:
                 mergedDocDic[k]=docDic[k]
+#            sys.stderr.write("step_1_2"+".\n")
             for k in enerDic:
                 mergedEnerDic[k]=enerDic[k]       
+#            sys.stderr.write("step_1_3"+".\n")
         else:
-
-            newDocDic,newEnerDic,smilesDic=readSdfFile(fl)
+#            sys.stderr.write("step_2"+".\n")
+            newDocDic,newEnerDic,smilesDic=readSdfFile(fl,inputPath)
             mergedDocDic.update(newDocDic)
             mergedEnerDic.update(newEnerDic)
+#            sys.stderr.write("step_2_1"+".\n")
             for k in newDocDic:
                 if k in docDic:
-                    docDic[k]+=newDocDic[k]
+                        docDic[k]+=newDocDic[k]
                 else:
                     docDic[k]=newDocDic[k]  
-
+#            sys.stderr.write("step_2_2"+".\n")
             for k in mergedDocDic:
                 if k in docDic:
                     a=1
                 else:
                     docDic[k]+=["empty"]
-
+                sys.stderr.write("step_2_3"+".\n")
+#    sys.stderr.write("step_3"+".\n")
     for k in docDic:
         docDic[k]=[]
+#    sys.stderr.write("step_3_1"+".\n")
     return docDic
 #----------------------------------------------------------------------------------
 def createTimeStamp():
@@ -120,7 +144,8 @@ def createTimeStamp():
 ##--------------------------------end function definition--------------------------------------------
 #------------------------------------MAIN---------------------------------------------------------------
 #------------------------------------VARIABLE----------------------------------------------------------
-def mainCliCall(fileList):
+def mainCliCall(fileList,inputPath):
+    pstr=""
     numOfFiles=0
     st=""
     compDic={}
@@ -128,20 +153,22 @@ def mainCliCall(fileList):
     smilesDic={}
     smilesDic={}
     printStr=""
-    inputPath="/home/nikos/data/"
+#    inputPath="/home/nikos/data/"
     st=createTimeStamp()
-    outputFileNameRank="output_RANK"+st+".dat"
-    outputFileNameEnergy="output_ENERGY"+st+".dat"
+    outputDir="output/"
+    outputFileNameRank=outputDir+"output_RANK"+st+".dat"
+    outputFileNameEnergy=outputDir+"output_ENERGY"+st+".dat"
     #readSdfFileMetadata(sdf_file1)
     numOfFiles=len(fileList)
-    compDic=createCompoundList(fileList) #find all  different compound exists in files
+    compDic=createCompoundList(fileList,inputPath) #find all  different compound exists in files
     energyDic={}
     rankDic={}
     energyDic=copy.deepcopy(compDic)
     rankDic=copy.deepcopy(compDic)
     #createTableFromFeatur(compouldsDictionary,dataDictionary)
     for fl in fileList:
-            newDocDic,newEnerDic,newSmilesDic=readSdfFile(fl)
+            sys.stderr.write(str(time.time())+" processing file:"+str((fl))+".\n")
+            newDocDic,newEnerDic,newSmilesDic=readSdfFile(fl,inputPath)
 
 
             for k in compDic:
@@ -153,15 +180,18 @@ def mainCliCall(fileList):
                     smilesDic[k]=newSmilesDic[k]
 
                 else:
-                    rankDic[k]+=["100"]
+                    rankDic[k]+=["100000"]
                     energyDic[k]+=["0"]
 
 
-    outRankStream=saveToFile(rankDic,smilesDic,numOfFiles,outputFileNameRank)
-    outEnergyStream=saveToFile(energyDic,smilesDic,numOfFiles,outputFileNameEnergy)
+    outRankStream=saveToFile(fileList,rankDic,smilesDic,numOfFiles,outputFileNameRank)
+    pstr+="Rank-data saved to file: "+outputFileNameRank+" <br>"
+    outEnergyStream=saveToFile(fileList,energyDic,smilesDic,numOfFiles,outputFileNameEnergy)
+    pstr+="Energy-data saved to file: "+outputFileNameEnergy+"<br>"
 #    print outRankStream
 #    print"----------"
 #    print outEnergyStream
+    return pstr
 #------------------------------end from CLI-------------------------------
 def readFormParams():
     form = cgi.FieldStorage()
@@ -169,7 +199,7 @@ def readFormParams():
     value = ""
     r = ""
     for key in form.keys():
-            print "n"
+#            print "n"
             variable = str(key)
             value = str(form.getvalue(variable))
             r += "<p>"+ variable +", "+ value +"</p>\n" 
@@ -180,7 +210,7 @@ def readFormFileNames():
     files = form.getvalue("files")
     r=""
     for fl in files:
-        r += "<p>"+ "The Files are" +", "+ fl +"</p>\n" 
+        r += "<p>"+ "file processed:" +", "+ fl +"</p>\n" 
     filesHtml = "<p>"+ str(r) +"</p>"
     return files,filesHtml
 
@@ -190,10 +220,10 @@ def readDataFromFileToDict(filename,rankThreshold,refereneceColumn):
     goon=True
     count=0
     linesNum=f.readline()
-    print linesNum
+#    print linesNum
     linesNum=linesNum.rstrip().split("\t")[1]
     columnsNum=f.readline()
-    print columnsNum
+#    print columnsNum
     columnsNum=columnsNum.rstrip().split("\t")[1]
     i=0
     outStr=""
@@ -243,7 +273,7 @@ def htmlHeader():
     hstr+="<meta name='robots' content='noindex'>"+"\n"
     hstr+="<META NAME='robots' CONTENT='nofollow'>"+"\n"
     hstr+="<title>bio-molecular_modeling</title>"+"\n"
-    hstr+="<link rel='stylesheet' type='text/css' href='normilize.css' />"+"\n"
+    hstr+="<link rel='stylesheet' type='text/css' href='css/normilize.css' />"+"\n"
 #    hsrt+="<link href='http://fonts.googleapis.com/css?family=Nunito:400,300' rel='stylesheet' type='text/css'>"+"\n"
     hstr+="</head>"+"\n"
     print hstr
@@ -269,7 +299,9 @@ def htmlBody():
 #        print fl
         flList+=[fl]
 #    print flList
-    mainCliCall(flList)
+    inputPath="./inputSDF/"
+    str+=mainCliCall(flList,inputPath)
+    
     str+= "</section>"+"\n"
     str+="</article>"+"\n"
     str+="<article>"+"\n"
@@ -287,6 +319,7 @@ def htmlFooter():
     print "</html>"
 
 #main program
+sys.stderr.write("\n"+str(time.time())+" createTableFiles_step2_start New Processing.\n")
 htmlHeader()
 htmlBody()
 htmlFooter()

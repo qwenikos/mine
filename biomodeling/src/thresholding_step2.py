@@ -1,49 +1,6 @@
 #!/usr/bin/python
 import cgi
-
-def readDataFromFileToDict(filename,rankThreshold,refereneceColumn):
-    f = open(filename, 'r')
-    dataDict={}
-    outDict={}
-    outStr=""
-    count=0
-    linesNum=f.readline()
-    outStr+=str(linesNum)+"<br>\n"
-    linesNum=linesNum.rstrip().split("\t")[1]
-    columnsNum=f.readline()
-    outStr+=str(columnsNum)+"<br>\n"
-    columnsNum=columnsNum.rstrip().split("\t")[1]
-    i=0
-    
-    for line in f:
-        i+=1
-        cols=line.rstrip().split("\t")
-        compoundName=cols[0]
-        smileStr=cols[1]
-        dataDict[cols[0]]=[]
-        firsrColumn=2
-        lastColumn=int(columnsNum)+1
-        refColumn=refereneceColumn+1 #efoson xekinan sto 2 
-        count=0
-        for j in range(firsrColumn,lastColumn+1): #gia kathe compound ypologise th diafora
-            if cols[j]=="": #an den yphrxe toy dinw  0 poy einai poly megalo
-                cols[j]=0
-            if cols[refColumn]=="": #an den yphrxe toy dinw  0 poy einai poly megalo
-                cols[refColumn]=0
-            difftoRef=float(cols[j])-float(cols[refColumn])
-            if difftoRef>rankThreshold:
-                count+=1 
-        if (count ==int(columnsNum)-1): #an se ola h diafora einai megalyterh apo to threshold
-            htmlLine=line.replace("\t","</font></td><td><font Face='Arial' size=1>")
-            htmlLine="<tr><td><font Face='Arial' size=1>"+htmlLine+"</font></td></tr>\n"
-            htmlLine+="\n"
-            outStr+=htmlLine
-            outDict[compoundName]=htmlLine
-        if i==200000:
-            break  
-    outStr="<table border=1>"+outStr+"</table>"
-    
-    return outStr,outDict
+import sys
 
 
 def htmlHeader():
@@ -55,7 +12,7 @@ def htmlHeader():
     hstr+="<meta name='robots' content='noindex'>"+"\n"
     hstr+="<META NAME='robots' CONTENT='nofollow'>"+"\n"
     hstr+="<title>bio-molecular_modeling</title>"+"\n"
-    hstr+="<link rel='stylesheet' type='text/css' href='normilize.css' />"+"\n"
+    hstr+="<link rel='stylesheet' type='text/css' href='css/normilize.css' />"+"\n"
 #    hsrt+="<link href='http://fonts.googleapis.com/css?family=Nunito:400,300' rel='stylesheet' type='text/css'>"+"\n"
     hstr+="</head>"+"\n"
     print hstr
@@ -73,82 +30,34 @@ def htmlBody():
     bstr+= "</aside>"+"\n"
     bstr+= "<article>"+"\n"
     bstr+= "<section>"+"\n"
-    energyThres=0
-    rankThres=0
-    goon=True
-    rankThreshold,energyThreshold,refereneceColumn,method=getFormVar()
-    energyThreshold==""
-    if refereneceColumn==None:
-        bstr+="referenece Column =NONE<br>"
-    else:           
-        bstr+="Column Data="+refereneceColumn+"<br>"     
-    filenameEnergy= "output_RANK2016-01-24_14_07_09.dat"
-    filenameRank= "output_ENERGY2016-01-24_14_07_09.dat"
-    if method=="rank":
-        bstr+="Filtering with Rank Threshold<br>"
-        
-        if rankThreshold=="None" or rankThreshold=="" :
-            bstr+="Rank Threshold=NONE<br>"
+    inputPath="/home/nikos/data/"
+    filesVersion,fileList=getFormVar()
+#    fileList=["file1","file","file3"]
+    bstr+="<form action='thresholding_step3.py' method='get' >"+"\n"
+    bstr+="<table border=0>"+"\n"
+#    bstr+="-->"+str(filesVersion)+"<--"
+    
+    bstr+="<tr><td colspan=2 align=right>Rank Threshold     </td><td colspan=4><input type='text' name='rankThreshold'>"+"</td></tr>"+"\n"
+    bstr+="<tr><td colspan=2 align=right>Energy Threshold</td><td colspan=4><input type='text' name='energyThreshold'>"+"</td></tr>"+"\n"
+    bstr+="<td>"+"Rank Filter"+" </td><td><input type='hidden' name='filesVersion' value='"+filesVersion+"'>"+"</td>"+"\n"
+    bstr+="<td>"+"Rank Filter"+" </td><td><input type='radio' name='method' value=rank checked=checked>"+"</td>"+"\n"
+    bstr+="<td>"+"Energy Filter"+" </td><td><input type='radio' name='method' value=energy>"+"</td>"+"\n"
+    bstr+="<td>"+"Both"+" </td><td><input type='radio' name='method' value=both>"+"</td></tr>"+"\n"
+    bstr+="</table>"+"\n"
+    
+    bstr+="<table border=0>"+"\n"
+    bstr+="<tr><th colspan=6>Referece File</th><th></th>"
+    i=1
+    for fl in fileList:
+        if i==1:
+            bstr+="<tr><td colspan=6>"+fl+" </td><td align=center><input type='radio' name='base_file' value="+str(i)+" checked=checked>"+"</td></tr>"+"\n"
         else:
-            
-            bstr+="Rank Threshold="+rankThreshold+"<br>"
-            outS,outD=readDataFromFileToDict(filenameRank,float(rankThreshold),int(refereneceColumn))
-            bstr+=outS
-#            print outD
+            bstr+="<tr><td colspan=6>"+fl+" </td><td align=center><input type='radio' name='base_file' value="+str(i)+"></td></tr>"+"\n"
+        i+=1
         
-    if method=="energy":
-        bstr+="Filtering with energy Threshold<br>"
-        if energyThreshold=="None" or energyThreshold=="":
-            bstr+="Energy Threshold=NONE<br>"
-        else:      
-            bstr+="Rank Threshold="+rankThreshold+"<br>"
-            outS,outD=readDataFromFileToDict(filenameEnergy,float(energyThreshold),int(refereneceColumn))
-            bstr+=outS
-#            print outD
-    if method=="both":
-        outDEnergy={}
-        outDRank={}
-        bstr+="filtering for energy and Ranking thresholds<br>\n"
-        if rankThreshold==None:
-            bstr+="Rank Threshold=NONE<br>"
-        else:
-            bstr+="Rank Threshold="+rankThreshold+"<br>"
-            outS,outDRank=readDataFromFileToDict(filenameRank,float(rankThreshold),int(refereneceColumn))
-        if energyThreshold==None:
-            bstr+="Energy Threshold=NONE<br>"
-        else:      
-            bstr+="Energy Threshold="+energyThreshold+"<br>"
-            outS,outDEnergy=readDataFromFileToDict(filenameEnergy,float(energyThreshold),int(refereneceColumn))
-        allKeys={}
-        for k in outDRank:
-            if k in outDEnergy:
-                allKeys[k]=1
-        for k in outDEnergy:
-            if k in outDRank:
-                allKeys[k]=1
-#        bstr+=str(allKeys)
-        
-        tempStr=""
-        for k in allKeys:
-            tempStr+=outDEnergy[k]+"\n"
-            tempStr+=outDRank[k]+"\n"
-        htmlTable="<table border=1>"+tempStr+"</table>"
-        tempStr=tempStr.replace("</font></td><td><font Face='Arial' size=1>","\t")
-        tempStr=tempStr.replace("<tr>","")
-        tempStr=tempStr.replace("</tr>","")
-        tempStr=tempStr.replace("</td>","")
-        tempStr=tempStr.replace("<td>","")
-        tempStr=tempStr.replace("</font>","")
-        tempStr=tempStr.replace("<font Face='Arial' size=1>","")
-        tempStr=tempStr.replace("\n\n","\n")
-        tempStr=tempStr.replace("\n\n","\n")
-        tempStr=tempStr.replace("\n\t","\n")
-#        print tempStr
-        textFile=open("outputFiltered.txt","w")
-        textFile.write(tempStr)
-        textFile.close()
-        bstr+=htmlTable
-        
+    bstr+="<tr><td colspan=3 align=center><input type=submit name='submit' value='Go on'></td></tr>"+"\n"
+    bstr+="</table>"+"\n"
+    bstr+="</form>"+"\n"
     bstr+= "</section>"+"\n"
     bstr+="</article>"+"\n"
     bstr+="<article>"+"\n"
@@ -160,20 +69,28 @@ def htmlBody():
     
     bstr+="</body>"
    
-    print bstr
 
-def htmlFooter():
-    print "</html>"
+
+    print bstr
+##--------------------------------------------------------
 def getFormVar():
     form = cgi.FieldStorage()
-    rankTh = str(form.getvalue("rankThreshold"))
-    EnergyTh = str(form.getvalue("energyThreshold"))
-    BaseFile = str(form.getvalue("base_file"))
-    method=str(form.getvalue("method"))
-    return rankTh,EnergyTh,BaseFile,method
+    filesVersion = str(form.getvalue("filesVersion"))
+    
+#    sys.stderr.write(">filesVersion>"+filesVersion+"<<\n")
+    timeStamp=filesVersion.rstrip().split("!!")[0]
+    sys.stderr.write(">timeStamp>"+timeStamp+"<<\n")
+    fileList=filesVersion.rstrip().split("!!")[1]
+    sys.stderr.write(">fileList>"+fileList+"<<\n")
+    fileList=fileList.replace("[","")
+    fileList=fileList.replace("]","")
+    fileList=fileList.rstrip().split(",")
+    return timeStamp,fileList
+##----------------------------------------------------------
+def htmlFooter():
+    print "</html>"
 #main program
 htmlHeader()
+
 htmlBody()
 htmlFooter()
-    
-    
